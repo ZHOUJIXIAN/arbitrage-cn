@@ -26,6 +26,10 @@ notification:
       enabled: true
       min_premium_rate: 0.015  # 最小溢价率（超过才通知）
       min_discount_rate: 0.01   # 最小折价率
+      notify_on_premium: true   # 溢价套利机会
+      notify_on_discount: true   # 折价套利机会
+      include_fund_details: true  # 包含基金详情
+      max_notifications_per_hour: 10  # 每小时最多通知次数
 
     # 交易通知
     trade:
@@ -34,9 +38,60 @@ notification:
       notify_on_sell: true
       notify_on_subscribe: true
       notify_on_redeem: true
+      include_price_change: true  # 包含价格变动
+      include_amount: true         # 包含金额
 
     # 错误通知
     error:
       enabled: true
       notify_on_connection_error: true
       notify_on_trade_error: true
+      notify_on_data_error: true
+      include_error_trace: true       # 包含错误堆栈
+      max_error_notifications_per_hour: 20  # 每小时最多错误通知次数
+
+    # 系统状态通知
+    system:
+      enabled: true
+      notify_on_startup: true        # 启动通知
+      notify_on_shutdown: true       # 关闭通知
+      notify_on_scan_complete: true  # 扫描完成通知
+      notify_on_position_change: true # 持仓变动通知
+      notify_interval_minutes: 30     # 系统状态通知间隔（分钟）
+
+  # 通知频率限制（避免刷屏）
+  rate_limit:
+    enabled: true
+    max_notifications_per_minute: 5  # 每分钟最多 5 条通知
+    min_interval_seconds: 30        # 同一类型通知最小间隔 30 秒
+    rate_limit_on_success: true      # 成功通知也受限制
+    rate_limit_on_error: false       # 错误通知不受限制（重要错误）
+
+  # 通知时间窗口（只在特定时间段发送通知）
+  time_window:
+    enabled: false  # 默认禁用
+    start_hour: 9   # 开始时间（9:00）
+    end_hour: 21    # 结束时间（21:00）
+    timezone: "Asia/Shanghai"  # 时区
+
+  # 通知优先级（重要通知会立即发送）
+  priority:
+    enabled: true
+    bypass_rate_limit_for_errors: true  # 错误通知不受频率限制
+    bypass_rate_limit_for_trades: true  # 交易通知不受频率限制
+
+  # 通知模板（自定义通知格式）
+  templates:
+    # 套利机会模板
+    opportunity_premium: "🚀 LOF 套利机会\n\n{fund_name}({fund_code})\n溢价率: {premium_rate:.2f}%\n场内: {price:.3f} / 净值: {nav:.3f}"
+    opportunity_discount: "📉 LOF 折价机会\n\n{fund_name}({fund_code})\n折价率: {discount_rate:.2f}%\n场内: {price:.3f} / 净值: {nav:.3f}"
+
+    # 交易模板
+    trade_buy: "🟢 买入\n{fund_name}({fund_code})\n{quantity}手 @ {price:.3f}\n金额: {amount:.2f}"
+    trade_sell: "🔴 卖出\n{fund_name}({fund_code})\n{quantity}手 @ {price:.3f}\n金额: {amount:.2f}"
+    trade_subscribe: "📋 申购\n{fund_name}({fund_code})\n{quantity}股 @ 100.00"
+
+    # 错误模板
+    error_connection: "❌ 连接失败\n无法连接到券商 API"
+    error_trade: "❌ 交易失败\n订单执行失败"
+    error_data: "⚠️ 数据错误\n获取基金数据失败"
