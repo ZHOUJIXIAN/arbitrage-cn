@@ -1,0 +1,28 @@
+# 数据获取
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=5.1.0
+
+# 数据处理
+pandas>=2.0.0
+numpy>=1.24.0
+
+# 配置文件
+pyyaml>=6.0
+
+# 日志
+loguru>=0.7.0
+
+# API 客户端
+easytrader>=0.48.0  # 券商客户端模拟
+# tqsdk>=2.15.0  # 天勤量化 SDK（可选）
+
+# 定时任务
+schedule>=1.2.0
+
+# 通知
+# python-telegram-bot>=20.7  # Telegram 通知（可选）
+
+# 时间处理
+python-dateutil>=2.8.0
+pytz>=2024.1

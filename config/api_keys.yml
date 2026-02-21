@@ -1,0 +1,20 @@
+# 券商 API 密钥配置
+# 请妥善保管，不要提交到 GitHub
+
+# 雪球 API（推荐）
+xueqiu:
+  username: ""  # 雪球账号
+  password: ""  # 雪球密码
+  cookie: ""   # 或者使用 cookie 登录（更稳定）
+  uid: ""      # 用户 ID
+
+# 天勤量化 SDK（备选）
+tqsdk:
+  broker_id: "simnow"  # simnow 是官方模拟账号，实盘需要填券商代码
+  account: ""
+  password: ""
+
+# 通知配置（可选）
+telegram:
+  bot_token: ""
+  chat_id: ""

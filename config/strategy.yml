@@ -1,0 +1,55 @@
+# 套利策略参数
+
+# LOF 基金套利
+lof:
+  # 基本参数
+  enabled: true
+  interval_seconds: 60  # 扫描间隔（秒）
+
+  # 套利阈值（考虑手续费）
+  min_premium_rate: 0.015    # 最小溢价率 1.5%（申购费 1.5%，需要更高）
+  min_discount_rate: 0.01   # 最小折价率 1%（赎回费 0.5%，需要更高）
+
+  # 交易金额
+  min_trade_amount: 1000     # 最小交易金额（元）
+  max_trade_amount: 20000    # 最大交易金额（元）
+
+  # 监控的 LOF 基金列表（场内代码）
+  watchlist:
+    - "163406"  # 兴全合润混合
+    - "161725"  # 招商中证白酒指数
+    - "160642"  # 鹏华中证传媒
+    - "165520"  # 信诚中证 TMT
+    - "160215"  # 国泰纳斯达克 100
+
+  # 风险控制
+  max_position_per_fund: 0.2  # 单只基金最大仓位占比（20%）
+  stop_loss_rate: -0.05       # 止损率（-5%）
+
+# 可转债打新
+bond:
+  # 基本参数
+  enabled: true
+  check_time: "09:30"  # 每日检查时间
+  check_days: "mon-fri"  # 工作日检查
+
+  # 申购参数
+  max_subscription_amount: 1000000  # 顶格申购金额（10k 张，100 万）
+  auto_subscribe: true              # 自动申购
+  simulate: true                    # 模拟模式（设为 false 才会真实下单）
+
+  # 通知
+  notify_on_new_bond: true   # 新债发行通知
+  notify_on_win: true       # 中签通知
+  notify_on_list: true      # 上市通知
+
+# 通用设置
+common:
+  # 模拟模式（设为 false 才会真实下单）
+  simulate_mode: true
+
+  # 日志级别：DEBUG, INFO, WARNING, ERROR
+  log_level: "INFO"
+
+  # 数据源：eastmoney, xueqiu, sina
+  data_source: "eastmoney"
