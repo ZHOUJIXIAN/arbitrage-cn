@@ -3,12 +3,14 @@ LOF 基金套利策略
 监控 LOF 基金场内价格与净值价差，自动执行套利
 """
 import time
+import yaml
 from typing import Dict, List, Optional
 from datetime import datetime
 
 from src.api.broker_base import BrokerBase, OrderType
 from src.utils.data_fetcher import DataFetcher
 from src.utils.logger import log
+from src.utils.notifier import NotificationManager
 
 
 class LOFArbitrage:
@@ -34,9 +36,24 @@ class LOFArbitrage:
         self.max_trade_amount = config.get('max_trade_amount', 20000)
         self.watchlist = config.get('watchlist', [])
 
+        # 通知系统
+        self.notifier = self._init_notifier()
+
         # 运行状态
         self.running = False
         self.opportunities = []  # 记录套利机会
+
+    def _init_notifier(self) -> Optional[NotificationManager]:
+        """初始化通知管理器"""
+        try:
+            # 加载通知配置
+            with open("config/notification.yml", "r", encoding="utf-8") as f:
+                notification_config = yaml.safe_load(f)
+
+            return NotificationManager(notification_config.get("notification", {}))
+        except Exception as e:
+            log.warning(f"通知系统初始化失败: {e}")
+            return None
 
     def run(self):
         """运行套利策略"""
@@ -101,6 +118,17 @@ class LOFArbitrage:
         if premium_rate >= self.min_premium_rate:
             log.info(f"发现溢价套利机会: {fund_name} 溢价率={premium_rate:.2%}")
 
+            # 发送通知
+            if self.notifier:
+                self.notifier.send_opportunity(
+                    fund_code=fund_code,
+                    fund_name=fund_name,
+                    opportunity_type="premium",
+                    premium_rate=premium_rate,
+                    price=price,
+                    nav=nav
+                )
+
             # 计算交易金额
             trade_amount = min(self.max_trade_amount, self.calculate_trade_amount(price))
 
@@ -114,6 +142,17 @@ class LOFArbitrage:
         # 折价套利：场内价格 < 净值 - 阈值
         elif premium_rate <= -self.min_discount_rate:
             log.info(f"发现折价套利机会: {fund_name} 折价率={abs(premium_rate):.2%}")
+
+            # 发送通知
+            if self.notifier:
+                self.notifier.send_opportunity(
+                    fund_code=fund_code,
+                    fund_name=fund_name,
+                    opportunity_type="discount",
+                    premium_rate=premium_rate,
+                    price=price,
+                    nav=nav
+                )
 
             # 计算交易金额
             trade_amount = min(self.max_trade_amount, self.calculate_trade_amount(price))
@@ -157,6 +196,19 @@ class LOFArbitrage:
 
         if self.simulate:
             log.info(f"[模拟模式] 溢价套利 {fund_name} 已记录")
+
+            # 发送交易通知
+            if self.notifier:
+                quantity = int(trade_amount / price)
+                self.notifier.send_trade(
+                    fund_code=fund_code,
+                    fund_name=fund_name,
+                    action="卖出",
+                    quantity=quantity,
+                    price=price,
+                    amount=trade_amount
+                )
+
             self.opportunities.append({
                 'type': 'premium',
                 'code': fund_code,
@@ -209,6 +261,19 @@ class LOFArbitrage:
 
         if self.simulate:
             log.info(f"[模拟模式] 折价套利 {fund_name} 已记录")
+
+            # 发送交易通知
+            if self.notifier:
+                quantity = int(trade_amount / price)
+                self.notifier.send_trade(
+                    fund_code=fund_code,
+                    fund_name=fund_name,
+                    action="买入",
+                    quantity=quantity,
+                    price=price,
+                    amount=trade_amount
+                )
+
             self.opportunities.append({
                 'type': 'discount',
                 'code': fund_code,

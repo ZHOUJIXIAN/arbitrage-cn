@@ -1,0 +1,42 @@
+# 通知配置
+
+notification:
+  # 启用通知
+  enabled: true
+
+  # 通知渠道（可多选: telegram, slack, console）
+  channels:
+    - console  # 控制台（测试用）
+    # - telegram  # Telegram
+    # - slack     # Slack
+
+  # Telegram 配置
+  telegram:
+    bot_token: ""  # Telegram Bot Token
+    chat_id: ""    # Chat ID
+
+  # Slack 配置
+  slack:
+    webhook_url: ""  # Slack Webhook URL
+
+  # 通知类型
+  types:
+    # 套利机会通知
+    opportunity:
+      enabled: true
+      min_premium_rate: 0.015  # 最小溢价率（超过才通知）
+      min_discount_rate: 0.01   # 最小折价率
+
+    # 交易通知
+    trade:
+      enabled: true
+      notify_on_buy: true
+      notify_on_sell: true
+      notify_on_subscribe: true
+      notify_on_redeem: true
+
+    # 错误通知
+    error:
+      enabled: true
+      notify_on_connection_error: true
+      notify_on_trade_error: true
